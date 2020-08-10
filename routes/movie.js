@@ -6,8 +6,20 @@ const Movie = require('../models/Movie');
 
 // All Movie
 router.get('/', (req, res) => {
-  const promise = Movie.find({ });
-  
+  const promise = Movie.aggregate([
+    {
+      $lookup: {
+        from: 'directors',
+        localField: 'director_id',
+        foreignField: '_id',
+        as: 'director'
+      }
+    },
+    {
+      $unwind: '$director'
+    }
+  ]);
+
   promise.then((data) => {
     res.json(data);
   }).catch((err) => {
@@ -26,7 +38,7 @@ router.get('/top10', (req, res) => {
   });
 });
 
-// One Movie Detail
+// Movie Detail
 router.get('/:movie_id', (req, res, next) => {
   const promise = Movie.findById(req.params.movie_id);
 
@@ -85,13 +97,14 @@ router.get('/between/:start_year/:end_year', (req, res) => {
 
 // Movie Add
 router.post('/', (req, res, next) => {
-  const { title, imdb_score, category, country, year } = req.body;
+  const { director_id, title, imdb_score, category, country, year } = req.body;
   const movie = new Movie({
     title: title,
     imdb_score: imdb_score,
     category: category,
     country: country,
-    year: year
+    year: year,
+    director_id: director_id,
   });
 
   const promise = movie.save();
