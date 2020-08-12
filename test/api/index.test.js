@@ -1,12 +1,12 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
-const server = require('../app');
+const server = require('../../app');
 
 chai.use(chaiHttp);
 
-describe('Node Server movie-api', () => {
-    it('(Get /) ana sayfa', (done) => {
+describe('Node Server', () => {
+    it('return the mainpage', (done) => {
         chai.request(server)
             .get('/')
             .end((err, res) => {
