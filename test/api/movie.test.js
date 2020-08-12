@@ -5,7 +5,7 @@ const server = require('../../app');
 
 chai.use(chaiHttp);
 
-let token;
+let token, movieId;
 
 describe('/api/movies tests', () => {
     before((done) => {
@@ -24,7 +24,7 @@ describe('/api/movies tests', () => {
     describe('/GET movie', () => {
         it('it should GET all the movie', (done) => {
             chai.request(server)
-                .get('api/movies')
+                .get('/api/movies')
                 .set('x-access-token', token)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -58,8 +58,28 @@ describe('/api/movies tests', () => {
                     res.body.should.have.property('country');
                     res.body.should.have.property('year');
                     res.body.should.have.property('imdb_score');
+                    movieId = res.body._id;
                     done();
                 });
         });
     });
+
+    describe('/GET/:movie_id movie', () => {
+        it('it should GET a movie by the given id', (done) => {
+            chai.request(server)
+                .get('/api/movies/' + movieId)
+                .set('x-access-token', token)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('title');
+                    res.body.should.have.property('director_id');
+                    res.body.should.have.property('category');
+                    res.body.should.have.property('country');
+                    res.body.should.have.property('year');
+                    res.body.should.have.property('imdb_score');
+                    done();
+                })
+        })
+    })
 });
